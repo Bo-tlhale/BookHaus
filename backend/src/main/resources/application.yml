@@ -10,5 +10,10 @@ spring:
   flyway:
     enabled: true
 
+bookhaus:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION:86400000}
+
 server:
   port: ${SERVER_PORT:8080}
