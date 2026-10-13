@@ -14,6 +14,10 @@ bookhaus:
   jwt:
     secret: ${JWT_SECRET}
     expiration: ${JWT_EXPIRATION:86400000}
+  open-library:
+    base-url: ${OPEN_LIBRARY_BASE_URL:https://openlibrary.org}
+    connect-timeout: 3s
+    read-timeout: 30s
 
 server:
   port: ${SERVER_PORT:8080}

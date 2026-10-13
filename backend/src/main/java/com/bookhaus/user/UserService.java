@@ -21,6 +21,11 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResponse getCurrentUser() {
+        return UserResponse.from(getCurrentUserEntity());
+    }
+
+    @Transactional(readOnly = true)
+    public User getCurrentUserEntity() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication is required");
@@ -28,7 +33,6 @@ public class UserService {
 
         String email = authentication.getName().trim().toLowerCase(Locale.ROOT);
         return userRepository.findByEmail(email)
-            .map(UserResponse::from)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authenticated user no longer exists"));
     }
 }
