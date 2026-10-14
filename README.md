@@ -4,7 +4,7 @@ BookHaus is a personal reading and library application for discovering books, bu
 
 ## Project status
 
-The backend is implemented through **Phase 6**.
+The backend is implemented through **Phase 7**.
 
 | Phase | Status | Scope |
 | --- | --- | --- |
@@ -14,7 +14,8 @@ The backend is implemented through **Phase 6**.
 | Authentication | Complete | Registration, login, BCrypt password hashing, JWT authentication and current-user lookup |
 | Phase 5: books | Complete | Open Library search, local book persistence, author/genre reuse and add-to-library flow |
 | Phase 6: library and shelves | Complete | Personal library browsing, status/progress/rating updates, shelf management and ordering |
-| Later application features | Planned | Journals, quotes, goals, statistics and frontend |
+| Phase 7: journals and quotes | Complete | Private reading reflections and favourite quote management |
+| Later application features | Planned | Goals, statistics and frontend |
 
 ## Technology
 
@@ -117,8 +118,16 @@ Authorization: Bearer <jwt-token>
 | `DELETE` | `/api/shelves/{id}/books/{libraryBookId}` | Required | Remove a book from a shelf only |
 | `PATCH` | `/api/shelves/reorder` | Required | Reorder all shelves using an ordered ID list |
 | `PATCH` | `/api/shelves/{id}/books/reorder` | Required | Reorder all books on a shelf |
+| `GET` | `/api/library/books/{id}/journal` | Required | Return the journal for an owned library item |
+| `PUT` | `/api/library/books/{id}/journal` | Required | Create or replace the journal content for an owned library item |
+| `GET` | `/api/library/books/{id}/quotes` | Required | List an owned library item's quotes oldest first |
+| `POST` | `/api/library/books/{id}/quotes` | Required | Add a favourite quote to an owned library item |
+| `PATCH` | `/api/library/books/{id}/quotes/{quoteId}` | Required | Update a quote belonging to the selected library item |
+| `DELETE` | `/api/library/books/{id}/quotes/{quoteId}` | Required | Delete only the selected quote |
 
 Personal-resource ownership is always derived from the authenticated user. Client requests cannot assign library data to an arbitrary user ID.
+
+Journal retrieval returns `404 Not Found` until a journal has been created. Journal text preserves user-entered casing, punctuation, whitespace and line breaks. Quotes are returned in ascending creation order, and quote text is trimmed only at its leading and trailing edges.
 
 ### Example authentication flow
 
@@ -169,7 +178,7 @@ Build the executable JAR:
 mvn package
 ```
 
-The tests cover authentication, JWT validation, protected endpoints, Open Library mapping and failures, book persistence, library updates, derived progress, shelf management, ordering, conflicts, ownership, and book details.
+The tests cover authentication, JWT validation, protected endpoints, Open Library mapping and failures, book persistence, library updates, derived progress, shelf management, journal upserts, quote validation and ordering, conflicts, ownership, and book details.
 
 ## Repository structure
 
@@ -180,6 +189,7 @@ bookhaus/
 |   |   |-- auth/
 |   |   |-- book/
 |   |   |-- config/
+|   |   |-- journal/
 |   |   |-- library/
 |   |   |-- shelf/
 |   |   `-- user/
@@ -209,7 +219,6 @@ The frontend and CI configuration will be introduced in later phases. Empty plac
 
 ## Next phases
 
-- Reading journals and saved quotes
 - Reading goals and statistics
 - OpenAPI documentation and CI
 - React frontend and the later immersive reading-room experience
