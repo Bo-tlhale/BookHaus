@@ -4,6 +4,8 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,6 +54,45 @@ class LibraryControllerSecurityTest {
                 .andExpect(status().isCreated());
 
         verify(libraryService).addBook(argThat(request -> request.externalId().equals("/works/OL893415W")));
+    }
+
+    @Test
+    void rejectsUnauthenticatedLibraryListing() throws Exception {
+        mockMvc.perform(get("/api/library/books"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void rejectsNegativeProgress() throws Exception {
+        mockMvc.perform(patch("/api/library/books/1/progress")
+                        .with(user("reader@example.com"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"currentPage\":-1}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void rejectsOutOfRangeOrOverPreciseRating() throws Exception {
+        mockMvc.perform(patch("/api/library/books/1/rating")
+                        .with(user("reader@example.com"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"personalRating\":6}"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(patch("/api/library/books/1/rating")
+                        .with(user("reader@example.com"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"personalRating\":4.75}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void rejectsInvalidReadingStatus() throws Exception {
+        mockMvc.perform(patch("/api/library/books/1/status")
+                        .with(user("reader@example.com"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"READING_SOMEDAY\"}"))
+                .andExpect(status().isBadRequest());
     }
 
     private String validJson() {

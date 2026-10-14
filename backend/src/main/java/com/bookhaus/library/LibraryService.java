@@ -9,8 +9,12 @@ import com.bookhaus.book.GenreRepository;
 import com.bookhaus.book.dto.AddBookRequest;
 import com.bookhaus.book.external.OpenLibraryClient;
 import com.bookhaus.library.dto.LibraryBookResponse;
+import com.bookhaus.library.dto.UpdateProgressRequest;
+import com.bookhaus.library.dto.UpdateRatingRequest;
+import com.bookhaus.library.dto.UpdateReadingStatusRequest;
 import com.bookhaus.user.User;
 import com.bookhaus.user.UserService;
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -74,6 +78,69 @@ public class LibraryService {
         } catch (DataIntegrityViolationException exception) {
             throw duplicateBook();
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<LibraryBookResponse> getLibrary(ReadingStatus status) {
+        User user = userService.getCurrentUserEntity();
+        List<LibraryBook> books = status == null
+                ? libraryBookRepository.findAllByUserOrderByAddedAtDesc(user)
+                : libraryBookRepository.findAllByUserAndStatusOrderByAddedAtDesc(user, status);
+        return books.stream().map(LibraryBookResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public LibraryBookResponse getLibraryBook(Long libraryBookId) {
+        return LibraryBookResponse.from(findOwnedLibraryBook(libraryBookId, userService.getCurrentUserEntity()));
+    }
+
+    @Transactional
+    public LibraryBookResponse updateStatus(Long libraryBookId, UpdateReadingStatusRequest request) {
+        LibraryBook libraryBook = findOwnedLibraryBook(libraryBookId, userService.getCurrentUserEntity());
+        LocalDate today = LocalDate.now();
+        libraryBook.setStatus(request.status());
+        if (request.status() == ReadingStatus.CURRENTLY_READING && libraryBook.getStartedDate() == null) {
+            libraryBook.setStartedDate(today);
+        }
+        if (request.status() == ReadingStatus.COMPLETED) {
+            if (libraryBook.getFinishedDate() == null) {
+                libraryBook.setFinishedDate(today);
+            }
+            Integer pageCount = libraryBook.getBook().getPageCount();
+            if (pageCount != null && pageCount > 0) {
+                libraryBook.setCurrentPage(pageCount);
+            }
+        }
+        return LibraryBookResponse.from(libraryBook);
+    }
+
+    @Transactional
+    public LibraryBookResponse updateProgress(Long libraryBookId, UpdateProgressRequest request) {
+        LibraryBook libraryBook = findOwnedLibraryBook(libraryBookId, userService.getCurrentUserEntity());
+        Integer pageCount = libraryBook.getBook().getPageCount();
+        if (pageCount != null && request.currentPage() > pageCount) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current page cannot exceed the book's page count");
+        }
+        libraryBook.setCurrentPage(request.currentPage());
+        return LibraryBookResponse.from(libraryBook);
+    }
+
+    @Transactional
+    public LibraryBookResponse updateRating(Long libraryBookId, UpdateRatingRequest request) {
+        LibraryBook libraryBook = findOwnedLibraryBook(libraryBookId, userService.getCurrentUserEntity());
+        libraryBook.setPersonalRating(request.personalRating());
+        return LibraryBookResponse.from(libraryBook);
+    }
+
+    @Transactional
+    public void removeBook(Long libraryBookId) {
+        LibraryBook libraryBook = findOwnedLibraryBook(libraryBookId, userService.getCurrentUserEntity());
+        libraryBookRepository.delete(libraryBook);
+    }
+
+    private LibraryBook findOwnedLibraryBook(Long libraryBookId, User user) {
+        return libraryBookRepository.findByIdAndUser(libraryBookId, user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Library book not found"));
     }
 
     private Optional<Book> findExistingBook(String externalId, String isbn, AddBookRequest request) {

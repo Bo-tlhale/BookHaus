@@ -4,7 +4,7 @@ BookHaus is a personal reading and library application for discovering books, bu
 
 ## Project status
 
-The backend is implemented through **Phase 5**.
+The backend is implemented through **Phase 6**.
 
 | Phase | Status | Scope |
 | --- | --- | --- |
@@ -13,7 +13,8 @@ The backend is implemented through **Phase 5**.
 | Database migrations | Complete | Flyway migrations V1-V6 for the current domain schema |
 | Authentication | Complete | Registration, login, BCrypt password hashing, JWT authentication and current-user lookup |
 | Phase 5: books | Complete | Open Library search, local book persistence, author/genre reuse and add-to-library flow |
-| Later application features | Planned | Shelf management, reading progress, journals, quotes, goals, statistics and frontend |
+| Phase 6: library and shelves | Complete | Personal library browsing, status/progress/rating updates, shelf management and ordering |
+| Later application features | Planned | Journals, quotes, goals, statistics and frontend |
 
 ## Technology
 
@@ -101,6 +102,21 @@ Authorization: Bearer <jwt-token>
 | `GET` | `/api/books/search?q={query}` | Required | Search Open Library without persisting results |
 | `GET` | `/api/books/{id}` | Required | Return a locally persisted book |
 | `POST` | `/api/library/books` | Required | Add an Open Library result to the authenticated user's library |
+| `GET` | `/api/library/books` | Required | List the user's library, optionally filtered by reading status |
+| `GET` | `/api/library/books/{id}` | Required | Return one owned library item |
+| `PATCH` | `/api/library/books/{id}/status` | Required | Update reading status |
+| `PATCH` | `/api/library/books/{id}/progress` | Required | Update the current page |
+| `PATCH` | `/api/library/books/{id}/rating` | Required | Set or clear a personal rating |
+| `DELETE` | `/api/library/books/{id}` | Required | Remove a book from the user's library |
+| `GET` | `/api/shelves` | Required | List the user's shelves in display order |
+| `GET` | `/api/shelves/{id}` | Required | Return an owned shelf and its ordered books |
+| `POST` | `/api/shelves` | Required | Create a shelf |
+| `PATCH` | `/api/shelves/{id}` | Required | Rename a shelf |
+| `DELETE` | `/api/shelves/{id}` | Required | Delete a shelf without deleting library books |
+| `POST` | `/api/shelves/{id}/books` | Required | Add an owned library book to a shelf |
+| `DELETE` | `/api/shelves/{id}/books/{libraryBookId}` | Required | Remove a book from a shelf only |
+| `PATCH` | `/api/shelves/reorder` | Required | Reorder all shelves using an ordered ID list |
+| `PATCH` | `/api/shelves/{id}/books/reorder` | Required | Reorder all books on a shelf |
 
 Personal-resource ownership is always derived from the authenticated user. Client requests cannot assign library data to an arbitrary user ID.
 
@@ -153,7 +169,7 @@ Build the executable JAR:
 mvn package
 ```
 
-The tests cover authentication, JWT validation, protected endpoints, Open Library mapping and failures, book persistence, author/genre reuse, duplicate library entries, ownership, and book details.
+The tests cover authentication, JWT validation, protected endpoints, Open Library mapping and failures, book persistence, library updates, derived progress, shelf management, ordering, conflicts, ownership, and book details.
 
 ## Repository structure
 
@@ -165,6 +181,7 @@ bookhaus/
 |   |   |-- book/
 |   |   |-- config/
 |   |   |-- library/
+|   |   |-- shelf/
 |   |   `-- user/
 |   |-- src/main/resources/
 |   |   |-- db/migration/
@@ -192,8 +209,6 @@ The frontend and CI configuration will be introduced in later phases. Empty plac
 
 ## Next phases
 
-- Shelf management
-- Reading progress and status updates
 - Reading journals and saved quotes
 - Reading goals and statistics
 - OpenAPI documentation and CI

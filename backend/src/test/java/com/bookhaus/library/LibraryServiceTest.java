@@ -83,8 +83,8 @@ class LibraryServiceTest {
         assertThat(stored.getIsbn13()).isEqualTo("9780441172719");
         assertThat(stored.getAuthors()).containsExactly(author);
         assertThat(stored.getGenres()).containsExactly(genre);
-        assertThat(response.status()).isEqualTo(ReadingStatus.CURRENTLY_READING);
-        assertThat(response.book().id()).isEqualTo(11L);
+        assertThat(response.readingStatus()).isEqualTo(ReadingStatus.CURRENTLY_READING);
+        assertThat(response.bookId()).isEqualTo(11L);
 
         ArgumentCaptor<LibraryBook> libraryCaptor = ArgumentCaptor.forClass(LibraryBook.class);
         verify(libraryBookRepository).saveAndFlush(libraryCaptor.capture());
@@ -103,7 +103,7 @@ class LibraryServiceTest {
         when(libraryBookRepository.existsByUserAndBook(any(), any())).thenReturn(false);
         when(libraryBookRepository.saveAndFlush(any(LibraryBook.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertThat(service.addBook(request).status()).isEqualTo(ReadingStatus.TO_READ);
+        assertThat(service.addBook(request).readingStatus()).isEqualTo(ReadingStatus.TO_READ);
         verify(authorRepository).save(any(Author.class));
         verify(genreRepository).save(any(Genre.class));
     }
