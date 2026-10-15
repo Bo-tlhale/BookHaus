@@ -16,6 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -63,6 +65,15 @@ class UserControllerSecurityTest {
     void rejectsUnauthenticatedRequest() throws Exception {
         mockMvc.perform(get("/api/users/me"))
             .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void allowsConfiguredFrontendCorsPreflight() throws Exception {
+        mockMvc.perform(options("/api/users/me")
+                .header("Origin", "http://localhost:5173")
+                .header("Access-Control-Request-Method", "GET"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5173"));
     }
 
     private User user() {

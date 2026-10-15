@@ -11,6 +11,8 @@ spring:
     enabled: true
 
 bookhaus:
+  cors:
+    allowed-origin: ${FRONTEND_URL:http://localhost:5173}
   jwt:
     secret: ${JWT_SECRET}
     expiration: ${JWT_EXPIRATION:86400000}

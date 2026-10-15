@@ -1,0 +1,25 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  * { @apply border-cream-200; }
+  html { @apply bg-cream-50 text-ink antialiased; }
+  body { @apply m-0 min-w-[320px] bg-cream-50; }
+  button, input, select, textarea { font: inherit; }
+  button, a { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender-500 focus-visible:ring-offset-2; }
+  ::selection { @apply bg-lavender-200 text-wood-900; }
+}
+
+@layer components {
+  .panel { @apply rounded-2xl border border-white/80 bg-white/80 shadow-card backdrop-blur-sm; }
+  .field { @apply w-full rounded-xl border border-cream-200 bg-white px-3.5 py-2.5 text-sm text-ink shadow-sm outline-none transition placeholder:text-stone-400 focus:border-lavender-400 focus:ring-2 focus:ring-lavender-100; }
+  .label { @apply mb-1.5 block text-sm font-semibold text-wood-700; }
+  .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-lavender-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-lavender-700 disabled:cursor-not-allowed disabled:opacity-55; }
+  .btn-secondary { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-lavender-200 bg-white px-4 py-2.5 text-sm font-semibold text-lavender-700 shadow-sm transition hover:bg-lavender-50 disabled:cursor-not-allowed disabled:opacity-55; }
+  .btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-wood-700 transition hover:bg-cream-100 disabled:cursor-not-allowed disabled:opacity-55; }
+  .btn-danger { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-55; }
+}
+
+.page-enter { animation: page-in 280ms ease-out both; }
+@keyframes page-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .page-enter { animation: none; } }

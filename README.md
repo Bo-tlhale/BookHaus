@@ -4,7 +4,7 @@ BookHaus is a personal reading and library application for discovering books, bu
 
 ## Project status
 
-The backend is implemented through **Phase 8**.
+The backend and complete functional frontend are implemented through **Phase 9**.
 
 | Phase | Status | Scope |
 | --- | --- | --- |
@@ -16,7 +16,8 @@ The backend is implemented through **Phase 8**.
 | Phase 6: library and shelves | Complete | Personal library browsing, status/progress/rating updates, shelf management and ordering |
 | Phase 7: journals and quotes | Complete | Private reading reflections and favourite quote management |
 | Phase 8: goals and statistics | Complete | Annual reading goals, derived progress and personal reading insights |
-| Later application features | Planned | API documentation, CI and frontend |
+| Phase 9: React frontend | Complete | Responsive authentication, discovery, library, shelves, journals, quotes, goals and insights experience |
+| Later application features | Planned | API documentation, CI and immersive reading room |
 
 ## Technology
 
@@ -31,6 +32,10 @@ The backend is implemented through **Phase 8**.
 - Lombok
 - Maven
 - Open Library Search and Covers APIs
+- React 19 and React Router
+- Vite
+- Tailwind CSS
+- Lucide icons
 
 ## Development environment
 
@@ -41,6 +46,7 @@ Required software:
 - Java 21
 - Maven 3.9+
 - PostgreSQL 15 or a compatible supported version
+- Node.js 20.19+ and npm
 
 ### 1. Create the database
 
@@ -63,6 +69,7 @@ DB_PASSWORD=your_postgres_password
 JWT_SECRET=your_base64_encoded_secret_of_at_least_32_bytes
 JWT_EXPIRATION=86400000
 OPEN_LIBRARY_BASE_URL=https://openlibrary.org
+FRONTEND_URL=http://localhost:5173
 ```
 
 Generate a suitable JWT secret in PowerShell:
@@ -87,6 +94,19 @@ mvn spring-boot:run
 The API starts on `http://localhost:8080` by default. Flyway validates and applies outstanding migrations automatically during startup, while Hibernate validates the resulting schema.
 
 Stop the application with `Ctrl+C` in the terminal where Maven is running.
+
+### 4. Run the frontend
+
+From a second terminal:
+
+```powershell
+cd frontend
+Copy-Item .env.example .env
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`. The frontend uses `VITE_API_BASE_URL` for the backend URL and stores the JWT in `sessionStorage`, so the session survives refreshes but ends when the browser tab session closes.
 
 ## API endpoints
 
@@ -190,6 +210,15 @@ Build the executable JAR:
 mvn package
 ```
 
+Run the frontend checks:
+
+```powershell
+cd frontend
+npm run lint
+npm test
+npm run build
+```
+
 The tests cover authentication, JWT validation, protected endpoints, Open Library mapping and failures, book persistence, library updates, derived progress, shelf management, journal upserts, quote validation and ordering, annual goals, fixed-clock pace calculations, statistics, conflicts, ownership, and book details.
 
 ## Repository structure
@@ -213,12 +242,22 @@ bookhaus/
 |   |   `-- application-dev.yml
 |   |-- src/test/java/com/bookhaus/
 |   `-- pom.xml
+|-- frontend/
+|   |-- src/
+|   |   |-- api/
+|   |   |-- components/
+|   |   |-- context/
+|   |   |-- layouts/
+|   |   |-- pages/
+|   |   `-- routes/
+|   |-- package.json
+|   `-- vite.config.js
 |-- .env.example
 |-- .gitignore
 `-- README.md
 ```
 
-The frontend and CI configuration will be introduced in later phases. Empty placeholder directories are intentionally avoided.
+The Phase 9 frontend is intentionally functional and two-dimensional. The immersive reading room and React Three Fiber experience remain reserved for the next phase.
 
 ## Architecture principles
 
@@ -234,4 +273,4 @@ The frontend and CI configuration will be introduced in later phases. Empty plac
 ## Next phases
 
 - OpenAPI documentation and CI
-- React frontend and the later immersive reading-room experience
+- Immersive React Three Fiber reading-room experience

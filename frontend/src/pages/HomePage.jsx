@@ -1,0 +1,22 @@
+import { useEffect, useState } from 'react'
+import { ArrowRight, BookCheck, BookOpen, Library, Search, Sparkles, Target } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { libraryApi } from '../api/libraryApi'
+import { statsApi } from '../api/statsApi'
+import BookCard from '../components/BookCard'
+import ErrorMessage from '../components/ErrorMessage'
+import { CardGridSkeleton } from '../components/LoadingSkeleton'
+import ProgressBar from '../components/ProgressBar'
+import StatCard from '../components/StatCard'
+import { useAuth } from '../context/useAuth'
+import { firstName } from '../utils/format'
+
+export default function HomePage() {
+  const { user } = useAuth(); const [data, setData] = useState(null); const [error, setError] = useState(null)
+  useEffect(() => { let active = true; Promise.all([statsApi.overview(), libraryApi.list()]).then(([stats, books]) => { if (active) setData({ stats, books }) }).catch(setError); return () => { active = false } }, [])
+  const currentlyReading = data?.books.filter((book) => book.readingStatus === 'CURRENTLY_READING').slice(0, 3) || []
+  const recent = data?.books.slice(0, 3) || []
+  return <><section className="relative mb-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-lavender-600 to-lavender-500 px-6 py-9 text-white shadow-soft sm:px-10 sm:py-11"><div className="absolute -right-10 -top-12 h-48 w-48 rounded-full border-[28px] border-white/10" /><Sparkles className="mb-4 h-6 w-6 text-lavender-200" /><p className="text-sm font-semibold text-lavender-100">Good to see you, {firstName(user?.name)}</p><h1 className="mt-2 max-w-2xl font-display text-4xl font-semibold leading-tight sm:text-5xl">What story feels right today?</h1><p className="mt-4 max-w-xl leading-7 text-lavender-100">Your books, reflections, and small reading victories are all here.</p><Link to="/search" className="mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-lavender-700 shadow-sm hover:bg-cream-50">Find your next read <ArrowRight className="h-4 w-4" /></Link></section><ErrorMessage error={error} />{!data ? <CardGridSkeleton count={3} /> : <><section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><StatCard label="In your library" value={data.stats.totalBooksInLibrary} icon={Library} /><StatCard label="Books completed" value={data.stats.completedBooks} icon={BookCheck} tone="green" /><StatCard label="Pages read" value={data.stats.totalPagesRead.toLocaleString()} icon={BookOpen} tone="blue" /><StatCard label="Average rating" value={data.stats.averageRating == null ? '—' : `${Number(data.stats.averageRating).toFixed(1)} ★`} icon={Sparkles} tone="wood" /></section>{data.stats.currentGoal && <section className="panel mt-7 grid gap-6 p-6 md:grid-cols-[1fr_auto] md:items-center"><div><div className="flex items-center gap-2 text-lavender-700"><Target className="h-5 w-5" /><p className="text-sm font-bold">{data.stats.currentGoal.year} reading goal</p></div><p className="mt-2 font-display text-2xl font-semibold text-wood-900">{data.stats.currentGoal.completedBooks} of {data.stats.currentGoal.targetBooks} books</p><div className="mt-4 max-w-xl"><ProgressBar value={data.stats.currentGoal.progressPercentage} /></div></div><div className={`rounded-2xl px-4 py-3 text-center text-sm font-bold ${data.stats.currentGoal.onPace ? 'bg-leaf-100 text-leaf-700' : 'bg-amber-50 text-amber-700'}`}>{data.stats.currentGoal.onPace ? 'Right on pace' : 'A little behind—keep going'}</div></section>}<BookSection title={currentlyReading.length ? 'Currently reading' : 'Recently added'} books={currentlyReading.length ? currentlyReading : recent} emptyText="Your shelves are waiting for their first story." /></>}</>
+}
+
+function BookSection({ title, books, emptyText }) { return <section className="mt-9"><div className="mb-4 flex items-center justify-between"><h2 className="font-display text-2xl font-semibold text-wood-900">{title}</h2><Link to="/library" className="text-sm font-bold text-lavender-700 hover:underline">View library</Link></div>{books.length ? <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">{books.map((book) => <BookCard key={book.libraryBookId} book={book} />)}</div> : <div className="panel flex items-center gap-4 p-6 text-stone-600"><Search className="h-6 w-6 text-lavender-500" /><p>{emptyText} <Link to="/search" className="font-bold text-lavender-700">Find a book.</Link></p></div>}</section> }

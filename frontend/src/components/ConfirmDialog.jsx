@@ -1,0 +1,6 @@
+import { AlertTriangle, X } from 'lucide-react'
+
+export default function ConfirmDialog({ open, title, description, confirmLabel = 'Confirm', onConfirm, onCancel, busy = false }) {
+  if (!open) return null
+  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-wood-900/35 p-4" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel() }}><div className="panel w-full max-w-md bg-white p-6" role="dialog" aria-modal="true" aria-labelledby="confirm-title"><div className="flex items-start justify-between gap-4"><div className="rounded-full bg-red-50 p-3 text-red-600"><AlertTriangle className="h-5 w-5" /></div><button type="button" onClick={onCancel} className="rounded-lg p-1 text-stone-500 hover:bg-stone-100" aria-label="Close"><X className="h-5 w-5" /></button></div><h2 id="confirm-title" className="mt-4 font-display text-2xl font-semibold text-wood-900">{title}</h2><p className="mt-2 text-sm leading-6 text-stone-600">{description}</p><div className="mt-6 flex justify-end gap-3"><button type="button" className="btn-secondary" onClick={onCancel} disabled={busy}>Cancel</button><button type="button" className="btn-danger" onClick={onConfirm} disabled={busy}>{busy ? 'Working…' : confirmLabel}</button></div></div></div>
+}
