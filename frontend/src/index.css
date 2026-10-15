@@ -1,25 +1,280 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+:root {
+  --page-gap: clamp(1rem, 2.2vw, 2rem);
+  --panel-padding: clamp(1rem, 2vw, 1.75rem);
+  --radius-card: 1.25rem;
+  --deep-plum: #2f1938;
+  --warm-white: #fffdf8;
+}
+
 @layer base {
   * { @apply border-cream-200; }
   html { @apply bg-cream-50 text-ink antialiased; }
   body { @apply m-0 min-w-[320px] bg-cream-50; }
   button, input, select, textarea { font: inherit; }
   button, a { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lavender-500 focus-visible:ring-offset-2; }
-  ::selection { @apply bg-lavender-200 text-wood-900; }
+  button { cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+  ::selection { @apply bg-lavender-200 text-plum; }
 }
 
 @layer components {
-  .panel { @apply rounded-2xl border border-white/80 bg-white/80 shadow-card backdrop-blur-sm; }
+  .panel, .cozy-panel { @apply rounded-[1.25rem] border border-white/90 bg-white/90 shadow-card; }
   .field { @apply w-full rounded-xl border border-cream-200 bg-white px-3.5 py-2.5 text-sm text-ink shadow-sm outline-none transition placeholder:text-stone-400 focus:border-lavender-400 focus:ring-2 focus:ring-lavender-100; }
   .label { @apply mb-1.5 block text-sm font-semibold text-wood-700; }
   .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-lavender-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-lavender-700 disabled:cursor-not-allowed disabled:opacity-55; }
   .btn-secondary { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-lavender-200 bg-white px-4 py-2.5 text-sm font-semibold text-lavender-700 shadow-sm transition hover:bg-lavender-50 disabled:cursor-not-allowed disabled:opacity-55; }
+  .btn-soft { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/40 bg-white/15 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/25; }
   .btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-wood-700 transition hover:bg-cream-100 disabled:cursor-not-allowed disabled:opacity-55; }
   .btn-danger { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-55; }
+  .eyebrow { @apply text-[11px] font-bold uppercase tracking-[0.2em] text-lavender-600; }
+  .chip { @apply inline-flex rounded-full bg-lavender-50 px-2.5 py-1 text-[11px] font-semibold text-lavender-700; }
+  .section-heading { @apply mb-5 flex items-start justify-between gap-4; }
+  .section-heading h2 { @apply font-display text-2xl font-semibold text-plum; }
+  .section-heading > a, .section-heading > button { @apply inline-flex items-center gap-1 text-sm font-bold text-lavender-700; }
+  .section-heading svg { @apply h-5 w-5; }
+  .icon-button { @apply rounded-xl p-2 text-plum transition hover:bg-lavender-50; }
 }
+
+.app-shell { min-height: 100vh; position: relative; isolation: isolate; }
+.app-shell__backdrop { position: fixed; inset: 0; z-index: -2; background: linear-gradient(rgba(255,253,248,.91), rgba(250,246,237,.95)), url('./assets/room/bookhaus-room-hero.jpg') center 30%/cover; }
+.app-shell__backdrop::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 15% 8%, rgba(255,255,255,.82), transparent 28%), radial-gradient(circle at 85% 30%, rgba(220,210,236,.25), transparent 30%); }
+.app-content { padding: 1.25rem var(--page-gap) 3rem; }
+.auth-page { @apply min-h-screen bg-cream-50 p-4 sm:p-8; }
+.auth-shell { @apply mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl overflow-hidden rounded-[2rem] border border-white bg-white/95 shadow-elevated md:grid-cols-[1.08fr_.92fr]; }
+.auth-art { @apply hidden flex-col justify-between bg-cover bg-center p-10 text-white md:flex lg:p-14; }
+.auth-art > div:last-child > svg { @apply mb-5 h-8 w-8 text-lavender-200; }
+.auth-art h2 { @apply max-w-lg font-display text-5xl font-semibold leading-tight; }
+.auth-art > div:last-child > p { @apply mt-5 max-w-md text-base leading-7 text-white/80; }
+.auth-form { @apply flex items-center justify-center p-6 sm:p-10; }
+
+.site-header { @apply sticky top-0 z-40 px-3 pt-3; }
+.site-header__inner { @apply mx-auto flex max-w-[1540px] items-center gap-3 rounded-2xl border border-white/90 bg-white/90 px-3 py-2 shadow-floating backdrop-blur-xl; }
+.brand-lockup { @apply flex shrink-0 items-center gap-2 text-plum; }
+.brand-mark { @apply flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-lavender-100 to-skybook-100 text-lavender-700; }
+.brand-mark svg { @apply h-7 w-7; }
+.brand-lockup strong { @apply block font-display text-2xl leading-none; }
+.brand-lockup small { @apply mt-1 hidden text-[8px] font-bold uppercase tracking-[0.18em] text-lavender-600 xl:block; }
+.top-nav { @apply mx-auto hidden items-center gap-1 lg:flex; }
+.top-nav__link { @apply flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-indigo-950 transition hover:bg-lavender-50; }
+.top-nav__link svg { @apply h-[18px] w-[18px] text-lavender-700; }
+.top-nav__link--active { @apply bg-lavender-100 text-lavender-700 shadow-sm; }
+.site-header__tools { @apply ml-auto flex items-center gap-2; }
+.global-search { @apply hidden items-center gap-2 rounded-xl border border-cream-200 bg-white px-3 py-2 xl:flex; }
+.global-search svg { @apply h-4 w-4 text-lavender-600; }
+.global-search input { @apply w-48 bg-transparent text-sm outline-none placeholder:text-stone-400 2xl:w-60; }
+.profile-button { @apply flex items-center gap-2 rounded-xl border border-cream-200 bg-white p-1.5 pr-2 text-sm font-semibold text-plum; }
+.profile-button img { @apply h-8 w-8 rounded-full object-cover; }
+.profile-button svg { @apply h-4 w-4; }
+.profile-menu { @apply absolute right-0 top-[calc(100%+.5rem)] w-60 rounded-2xl border border-cream-200 bg-white p-3 shadow-elevated; }
+.profile-menu p { @apply truncate font-semibold text-plum; }
+.profile-menu span { @apply block truncate text-xs text-stone-500; }
+.profile-menu button { @apply mt-3 flex w-full items-center gap-2 rounded-xl border-t border-cream-200 px-2 pt-3 text-sm font-semibold text-stone-600; }
+.profile-menu svg { @apply h-4 w-4; }
+.mobile-menu-button { @apply rounded-xl p-2 text-plum lg:hidden; }
+.mobile-nav-backdrop { @apply fixed inset-0 z-50 bg-plum/30 backdrop-blur-sm lg:hidden; }
+.mobile-nav { @apply flex h-full w-[min(22rem,88vw)] flex-col bg-cream-50 p-5 shadow-2xl; }
+.mobile-nav .top-nav__link { @apply flex; }
+
+.page-hero { @apply relative mb-6 min-h-48 overflow-hidden rounded-[1.6rem] border border-white/90 bg-white/85 p-6 shadow-soft sm:p-9; }
+.page-hero--compact { @apply min-h-0; }
+.page-hero--image { @apply min-h-64 bg-cover bg-center lg:min-h-72; }
+.page-hero h1 { @apply mt-2 font-display text-4xl font-semibold leading-[1.02] text-plum sm:text-5xl; }
+.page-hero > div > p:not(.eyebrow) { @apply mt-3 max-w-xl text-base leading-7 text-lavender-700; }
+.decorative-note { @apply absolute bottom-5 right-7 rotate-[-4deg] font-display text-xl italic leading-relaxed text-lavender-600; font-family: "Segoe Print", "Bradley Hand", cursive; }
+
+.home-hero { @apply relative mb-6 min-h-[35rem] overflow-hidden rounded-[1.8rem] border border-white/50 bg-cover bg-center shadow-elevated; }
+.home-hero__copy { @apply absolute left-0 top-0 flex h-full max-w-2xl flex-col justify-center p-7 text-white sm:p-12; }
+.home-hero__copy h1 { @apply mt-3 font-display text-5xl font-semibold leading-[.98] sm:text-6xl; }
+.home-hero__copy > p:not(.eyebrow) { @apply mt-5 max-w-xl text-base leading-7 text-white/80 sm:text-lg; }
+.home-hero__note { @apply absolute bottom-8 right-8 hidden rotate-[-4deg] rounded-2xl bg-white/85 p-5 font-display text-xl italic leading-relaxed text-lavender-700 shadow-lg backdrop-blur lg:block; font-family: "Segoe Print", cursive; }
+.home-hero__note span { @apply text-lavender-400; }
+.summary-strip { @apply mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4; }
+.summary-strip .panel { @apply flex min-h-32 items-center gap-4 p-5; }
+.summary-strip .panel > div:first-child { @apply mb-0 shrink-0; }
+.home-grid { @apply grid gap-5 xl:grid-cols-[minmax(0,1.8fr)_minmax(18rem,.8fr)]; }
+.home-current { @apply p-6 sm:p-7; }
+.continue-card { @apply grid items-center gap-6 sm:grid-cols-[9rem_1fr]; }
+.continue-card h3 { @apply mt-2 font-display text-3xl font-semibold text-plum; }
+.continue-card > div > p:not(.eyebrow) { @apply mt-1 text-stone-500; }
+.shortcut-card { @apply flex items-center gap-4 rounded-[1.25rem] border border-white/90 bg-white/90 p-5 shadow-card transition hover:-translate-y-0.5 hover:shadow-floating; }
+.shortcut-card > span { @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-lavender-100 text-lavender-700; }
+.shortcut-card h3 { @apply font-display text-lg font-semibold text-plum; }
+.shortcut-card p { @apply mt-1 text-xs text-stone-500; }
+.shortcut-card > svg { @apply ml-auto h-4 w-4 text-lavender-500; }
+.empty-cozy { @apply flex min-h-52 flex-col items-center justify-center gap-4 rounded-2xl bg-cream-50 text-center text-stone-600; }
+
+.library-layout { @apply grid gap-5 lg:grid-cols-[15rem_minmax(0,1fr)]; }
+.library-sidebar { @apply h-fit p-4 lg:sticky lg:top-24; }
+.library-sidebar h2, .journal-sidebar h2 { @apply mb-5 flex items-center gap-2 font-display text-2xl font-semibold text-plum; }
+.library-sidebar h2 svg, .journal-sidebar h2 svg { @apply h-6 w-6 text-lavender-600; }
+.library-sidebar__item { @apply mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-stone-600 transition hover:bg-cream-100; }
+.library-sidebar__item svg { @apply h-[18px] w-[18px] text-lavender-600; }
+.library-sidebar__item b { @apply ml-auto rounded-full bg-cream-100 px-2 py-0.5 text-xs; }
+.library-sidebar__item.is-active { @apply bg-lavender-100 text-lavender-700; }
+.library-sidebar__note { @apply mt-6 rounded-2xl bg-gradient-to-br from-lavender-50 to-blush-50 p-4 font-display text-lg italic leading-relaxed text-lavender-700; font-family: "Segoe Print", cursive; }
+.summary-strip--library { @apply mb-4; }
+.summary-strip--library .panel { @apply min-h-28; }
+.library-toolbar { @apply mb-4 flex flex-wrap items-center gap-3 rounded-[1.25rem] border border-white/90 bg-white/90 p-3 shadow-card; }
+.library-toolbar select, .search-result-card select { @apply rounded-xl border border-cream-200 bg-white px-3 py-2.5 text-sm text-stone-600 outline-none; }
+.search-field { @apply flex min-w-56 flex-1 items-center gap-2 rounded-xl border border-cream-200 bg-white px-3 py-2.5; }
+.search-field svg { @apply h-4 w-4 text-lavender-500; }
+.search-field input { @apply w-full bg-transparent text-sm outline-none; }
+.book-grid { @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4; }
+.book-card { @apply overflow-hidden rounded-[1.15rem] border border-white/90 bg-white/95 shadow-card transition hover:-translate-y-1 hover:shadow-floating; }
+.book-card__cover-link { @apply block bg-gradient-to-b from-cream-100 to-lavender-50 p-3; }
+.book-card__cover { @apply mx-auto aspect-[2/3] h-64 w-full rounded-xl object-cover shadow-md; }
+.book-card__body { @apply p-4; }
+
+.discover-search { @apply mb-5 flex items-center gap-3 rounded-2xl border border-white bg-white/95 p-3 shadow-card; }
+.discover-search > svg { @apply ml-2 h-5 w-5 text-lavender-600; }
+.discover-search input { @apply min-w-0 flex-1 bg-transparent text-base outline-none; }
+.discover-layout { @apply grid gap-5 lg:grid-cols-[20rem_minmax(0,1fr)]; }
+.discover-sidebar, .discovery-cards { @apply p-6; }
+.chip-cloud { @apply flex flex-wrap gap-2; }
+.chip-cloud button { @apply rounded-full bg-lavender-50 px-3 py-2 text-sm font-semibold text-lavender-700 hover:bg-lavender-100; }
+.recent-searches { @apply grid gap-1; }
+.recent-searches button { @apply flex items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-stone-600 hover:bg-cream-100; }
+.recent-searches svg { @apply h-4 w-4 text-lavender-500; }
+.recent-searches p { @apply text-sm text-stone-500; }
+.mood-grid { @apply grid gap-3 sm:grid-cols-2; }
+.mood-grid button { @apply flex items-center gap-3 rounded-2xl border border-lavender-100 bg-gradient-to-r from-cream-50 to-lavender-50 p-4 text-left font-semibold text-plum transition hover:border-lavender-300; }
+.mood-grid svg { @apply h-5 w-5 text-blush-500; }
+.discover-note { @apply mt-6 flex items-start gap-4 rounded-2xl bg-skybook-50 p-5; }
+.discover-note > svg { @apply h-7 w-7 text-skybook-600; }
+.discover-note h3 { @apply font-display text-xl font-semibold text-plum; }
+.discover-note p { @apply mt-1 text-sm leading-6 text-stone-600; }
+.search-layout { @apply grid gap-5 lg:grid-cols-[16rem_minmax(0,1fr)]; }
+.search-filters { @apply h-fit p-5 lg:sticky lg:top-24; }
+.search-filters h2 { @apply mb-4 flex items-center gap-2 font-display text-xl font-semibold text-plum; }
+.search-filters h2 svg { @apply h-5 w-5 text-lavender-600; }
+.search-filters button { @apply flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm text-stone-600 hover:bg-cream-100; }
+.search-filters button.is-active { @apply bg-lavender-100 font-bold text-lavender-700; }
+.search-filters button span { @apply text-xs; }
+.search-filters > p { @apply mt-5 border-t border-cream-200 pt-4 text-xs leading-5 text-stone-500; }
+.search-results { @apply grid gap-4 xl:grid-cols-2; }
+.search-result-card { @apply grid gap-4 rounded-[1.2rem] border border-white/90 bg-white/95 p-4 shadow-card sm:grid-cols-[8rem_1fr]; }
+.search-result-card__cover { @apply h-48 w-32 rounded-xl object-cover shadow-md; }
+.search-result-card h2 { @apply font-display text-2xl font-semibold leading-tight text-plum; }
+.search-result-card__author { @apply mt-1 text-sm font-medium text-lavender-700; }
+.metadata-row { @apply mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-stone-500; }
+.metadata-row span { @apply inline-flex items-center gap-1; }
+.metadata-row svg { @apply h-3.5 w-3.5; }
+.search-result-card__description { @apply mt-3 line-clamp-3 text-sm leading-6 text-stone-600; }
+
+.shelf-toolbar { @apply mb-5 flex flex-col justify-between gap-4 p-5 md:flex-row md:items-center; }
+.shelf-toolbar h2 { @apply mt-1 font-display text-2xl font-semibold text-plum; }
+.shelf-toolbar form { @apply flex flex-col gap-2 sm:flex-row; }
+.shelf-toolbar svg { @apply h-4 w-4; }
+.shelf-edit { @apply mb-5 flex flex-wrap items-end gap-3 p-5; }
+.shelf-edit > label { @apply w-full; }
+.shelf-edit input { @apply min-w-52 flex-1; }
+.shelf-grid { @apply grid gap-5 md:grid-cols-2 xl:grid-cols-3; }
+.shelf-card { @apply rounded-[1.25rem] border border-white/90 bg-white/95 p-4 shadow-card; }
+.shelf-card__heading { @apply mb-3 flex items-center gap-3; }
+.shelf-card__heading > svg { @apply h-5 w-5 text-lavender-500; }
+.shelf-card__heading > svg:last-child { @apply ml-auto; }
+.shelf-card__heading h2 { @apply font-display text-xl font-semibold text-plum; }
+.shelf-card__heading p { @apply text-xs text-stone-500; }
+.mini-shelf { @apply relative flex h-40 items-end gap-2 overflow-hidden rounded-xl bg-gradient-to-b from-cream-50 via-amber-50 to-wood-100 px-5 pb-7; }
+.mini-shelf i { @apply block w-5 rounded-t-sm shadow-sm; }
+.mini-shelf b { @apply absolute bottom-4 left-3 right-3 h-3 rounded bg-wood-500 shadow-md; }
+.mini-shelf__plant { @apply absolute right-5 top-3 text-3xl text-leaf-500; }
+.shelf-card__actions { @apply mt-3 flex justify-end gap-1; }
+.shelf-card__actions button { @apply rounded-lg p-2 text-stone-500 hover:bg-cream-100 hover:text-plum disabled:opacity-30; }
+.shelf-card__actions svg { @apply h-4 w-4; }
+
+.journal-layout { @apply grid gap-5 lg:grid-cols-[16rem_minmax(0,1fr)]; }
+.journal-sidebar { @apply flex h-fit flex-col p-5 lg:min-h-[34rem]; }
+.journal-sidebar > div { @apply flex items-center justify-between border-b border-cream-200 py-3 text-sm text-stone-600; }
+.journal-sidebar span { @apply flex items-center gap-2; }
+.journal-sidebar svg { @apply h-4 w-4 text-lavender-600; }
+.journal-book-list { @apply grid gap-3 sm:grid-cols-2; }
+.journal-book-list > a { @apply flex gap-4 rounded-2xl border border-cream-200 bg-cream-50/60 p-3 transition hover:border-lavender-200 hover:bg-lavender-50; }
+.journal-book-list h3 { @apply font-display text-lg font-semibold text-plum; }
+.journal-book-list p { @apply text-sm text-stone-500; }
+.journal-book-list span { @apply mt-2 block text-xs font-bold text-lavender-700; }
+
+.goal-ring { @apply mx-auto flex h-60 w-60 items-center justify-center rounded-full; background: conic-gradient(#8273f0 var(--goal-progress), #e8e5ff 0); }
+.goal-ring::before { content: ''; @apply absolute; }
+.goal-ring__inner { @apply flex h-[82%] w-[82%] flex-col items-center justify-center rounded-full bg-white text-center shadow-inner; }
+.goal-ring__inner svg { @apply mb-1 h-7 w-7 text-lavender-600; }
+.goal-ring__inner strong { @apply font-display text-4xl text-plum; }
+.goal-ring__inner span { @apply text-sm text-stone-500; }
+.goal-ring__inner b { @apply mt-1 text-lavender-700; }
+.goals-overview { @apply mb-5 grid gap-5 xl:grid-cols-[30rem_minmax(0,1fr)]; }
+.goal-feature { @apply p-6; }
+.goal-stat-grid { @apply grid gap-4 sm:grid-cols-2; }
+.goal-stat-grid .panel { @apply p-4; }
+.goals-manage { @apply grid gap-5 xl:grid-cols-2; }
+.goal-form { @apply grid gap-4 sm:grid-cols-2; }
+.goal-form button { @apply sm:col-span-2; }
+.goal-list { @apply grid gap-3; }
+.goal-list article { @apply grid grid-cols-[1fr_minmax(7rem,1fr)_auto_auto] items-center gap-3 rounded-xl bg-cream-50 p-3; }
+.goal-list article > div:first-child { @apply flex flex-col; }
+.goal-list article strong { @apply font-display text-xl text-plum; }
+.goal-list article span { @apply text-xs text-stone-500; }
+.goal-list article > button { @apply rounded-lg p-2 text-stone-500 hover:bg-white; }
+.goal-list article svg { @apply h-4 w-4; }
+
+.customize-layout { @apply grid gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(24rem,.9fr)]; }
+.room-preview { @apply relative min-h-[42rem] overflow-hidden rounded-[1.6rem] border border-white bg-cover bg-center shadow-elevated transition; }
+.room-preview::after { content: ''; @apply absolute inset-0; background: linear-gradient(180deg, transparent 55%, rgba(38,22,45,.42)); }
+.room-preview.light-moonlight { filter: hue-rotate(18deg) brightness(.7) saturate(.9); }
+.room-preview.light-daylight { filter: brightness(1.15) saturate(.8); }
+.room-preview.light-candlelight { filter: sepia(.18) brightness(.86) saturate(1.2); }
+.room-preview.theme-forest { filter: hue-rotate(35deg) saturate(.8); }
+.room-preview.theme-paris { filter: sepia(.12) saturate(.85); }
+.room-preview__label { @apply absolute left-5 top-5 z-10 flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-lavender-700 shadow-lg; }
+.room-preview__label svg { @apply h-4 w-4; }
+.room-preview > p { @apply absolute bottom-7 left-7 z-10 rotate-[-3deg] rounded-2xl bg-white/85 p-5 font-display text-xl italic leading-relaxed text-lavender-700 shadow-lg; font-family: "Segoe Print", cursive; }
+.customization-panel { @apply p-5 sm:p-6; }
+.choice-group { @apply border-t border-cream-200 py-5; }
+.choice-group h3 { @apply mb-3 flex items-center gap-2 font-display text-xl font-semibold text-plum; }
+.choice-group h3 svg { @apply h-5 w-5 text-lavender-600; }
+.choice-group > div { @apply grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-2 2xl:grid-cols-4; }
+.choice-group button { @apply relative rounded-xl border border-cream-200 bg-cream-50 p-2 text-left text-xs font-semibold text-stone-600 transition hover:border-lavender-300; }
+.choice-group button.is-active { @apply border-lavender-500 bg-lavender-50 text-lavender-700 ring-2 ring-lavender-100; }
+.choice-group button > svg { @apply absolute right-1 top-1 h-4 w-4 rounded-full bg-white text-lavender-700; }
+.choice-swatch { @apply mb-2 block h-16 rounded-lg bg-gradient-to-br from-cream-100 to-lavender-200; }
+.choice-swatch--theme-1, .choice-swatch--lighting-2 { @apply from-indigo-950 to-lavender-500; }
+.choice-swatch--theme-2 { @apply from-leaf-300 to-wood-500; }
+.choice-swatch--theme-3 { @apply from-blush-100 to-skybook-200; }
+.choice-swatch--lighting-0 { @apply from-white to-skybook-100; }
+.choice-swatch--lighting-1 { @apply from-amber-100 to-amber-400; }
+.choice-swatch--lighting-3 { @apply from-amber-300 to-wood-700; }
+.choice-swatch--shelves-0, .choice-swatch--shelves-1, .choice-swatch--shelves-2, .choice-swatch--shelves-3 { @apply from-wood-100 to-wood-500; }
+.choice-swatch--decor-0 { @apply from-leaf-100 to-leaf-500; }
+.choice-swatch--decor-4 { @apply from-amber-100 to-amber-400; }
+.customization-actions { @apply flex flex-col gap-3 border-t border-cream-200 pt-5 sm:flex-row; }
+.customization-actions button { @apply flex-1; }
+.customization-actions svg { @apply h-4 w-4; }
 
 .page-enter { animation: page-in 280ms ease-out both; }
 @keyframes page-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-@media (prefers-reduced-motion: reduce) { .page-enter { animation: none; } }
+
+@media (max-width: 1023px) {
+  .decorative-note { display: none; }
+  .page-hero--image { background-position: 62% center; }
+}
+@media (max-width: 767px) {
+  .app-content { padding-top: .85rem; }
+  .site-header__inner { border-radius: 1rem; }
+  .brand-lockup strong { font-size: 1.3rem; }
+  .brand-mark { width: 2.35rem; height: 2.35rem; }
+  .profile-button span, .profile-button > svg { display: none; }
+  .home-hero { min-height: 31rem; background-position: 64% center; }
+  .home-hero__copy { justify-content: flex-end; background: linear-gradient(0deg, rgba(38,22,45,.9), rgba(38,22,45,.05) 75%); }
+  .home-hero__copy h1 { font-size: 2.7rem; }
+  .page-hero h1 { font-size: 2.5rem; }
+  .page-hero--image { min-height: 20rem; background-position: 66% center; }
+  .page-hero--image::after { content: ''; position: absolute; inset: 0; background: rgba(255,250,242,.2); }
+  .search-result-card { grid-template-columns: 6rem 1fr; }
+  .search-result-card__cover { width: 6rem; height: 9rem; }
+  .goal-list article { grid-template-columns: 1fr auto auto; }
+  .goal-list article > div:nth-child(2) { grid-column: 1 / -1; grid-row: 2; }
+  .room-preview { min-height: 28rem; }
+}
+@media (prefers-reduced-motion: reduce) { .page-enter { animation: none; } *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; } }
