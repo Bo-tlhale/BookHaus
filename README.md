@@ -4,7 +4,7 @@ BookHaus is a personal reading and library application for discovering books, bu
 
 ## Project status
 
-The backend is implemented through **Phase 7**.
+The backend is implemented through **Phase 8**.
 
 | Phase | Status | Scope |
 | --- | --- | --- |
@@ -15,7 +15,8 @@ The backend is implemented through **Phase 7**.
 | Phase 5: books | Complete | Open Library search, local book persistence, author/genre reuse and add-to-library flow |
 | Phase 6: library and shelves | Complete | Personal library browsing, status/progress/rating updates, shelf management and ordering |
 | Phase 7: journals and quotes | Complete | Private reading reflections and favourite quote management |
-| Later application features | Planned | Goals, statistics and frontend |
+| Phase 8: goals and statistics | Complete | Annual reading goals, derived progress and personal reading insights |
+| Later application features | Planned | API documentation, CI and frontend |
 
 ## Technology
 
@@ -124,10 +125,21 @@ Authorization: Bearer <jwt-token>
 | `POST` | `/api/library/books/{id}/quotes` | Required | Add a favourite quote to an owned library item |
 | `PATCH` | `/api/library/books/{id}/quotes/{quoteId}` | Required | Update a quote belonging to the selected library item |
 | `DELETE` | `/api/library/books/{id}/quotes/{quoteId}` | Required | Delete only the selected quote |
+| `POST` | `/api/goals` | Required | Create one annual reading goal per year |
+| `GET` | `/api/goals` | Required | List the user's reading goals by year descending |
+| `GET` | `/api/goals/{year}` | Required | Return the user's goal and derived progress for a year |
+| `PATCH` | `/api/goals/{year}` | Required | Update an owned goal's target |
+| `DELETE` | `/api/goals/{year}` | Required | Delete an owned goal only |
+| `GET` | `/api/stats` | Required | Return the user's library totals, reading metrics, genres and current goal |
+| `GET` | `/api/stats/year/{year}` | Required | Return completion statistics restricted to the selected year |
 
 Personal-resource ownership is always derived from the authenticated user. Client requests cannot assign library data to an arbitrary user ID.
 
 Journal retrieval returns `404 Not Found` until a journal has been created. Journal text preserves user-entered casing, punctuation, whitespace and line breaks. Quotes are returned in ascending creation order, and quote text is trimmed only at its leading and trailing edges.
+
+Goal completion counts only `COMPLETED` books with a `finishedDate` in the goal year. Goal percentages, remaining books and pace are calculated at request time rather than persisted. Current-year pace compares completed-target progress with the elapsed portion of the year; past years require the final target to have been met, while future goals are considered on pace before progress is expected.
+
+Statistics are derived from the authenticated user's library. Total pages count known full page counts for completed books and current-page progress for currently reading or DNF books. Because reading sessions are not tracked, yearly pages conservatively include only known page counts for books completed in that year; they do not estimate pages from ongoing books. Unrated books are excluded from averages, and completed books contribute to every associated genre.
 
 ### Example authentication flow
 
@@ -178,7 +190,7 @@ Build the executable JAR:
 mvn package
 ```
 
-The tests cover authentication, JWT validation, protected endpoints, Open Library mapping and failures, book persistence, library updates, derived progress, shelf management, journal upserts, quote validation and ordering, conflicts, ownership, and book details.
+The tests cover authentication, JWT validation, protected endpoints, Open Library mapping and failures, book persistence, library updates, derived progress, shelf management, journal upserts, quote validation and ordering, annual goals, fixed-clock pace calculations, statistics, conflicts, ownership, and book details.
 
 ## Repository structure
 
@@ -189,9 +201,11 @@ bookhaus/
 |   |   |-- auth/
 |   |   |-- book/
 |   |   |-- config/
+|   |   |-- goal/
 |   |   |-- journal/
 |   |   |-- library/
 |   |   |-- shelf/
+|   |   |-- stats/
 |   |   `-- user/
 |   |-- src/main/resources/
 |   |   |-- db/migration/
@@ -219,6 +233,5 @@ The frontend and CI configuration will be introduced in later phases. Empty plac
 
 ## Next phases
 
-- Reading goals and statistics
 - OpenAPI documentation and CI
 - React frontend and the later immersive reading-room experience

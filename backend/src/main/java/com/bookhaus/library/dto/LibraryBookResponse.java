@@ -36,7 +36,7 @@ public record LibraryBookResponse(
                 libraryBook.getStatus(),
                 libraryBook.getCurrentPage(),
                 book.getPageCount(),
-                progressPercentage(libraryBook.getCurrentPage(), book.getPageCount()),
+                progressPercentage(libraryBook.getStatus(), libraryBook.getCurrentPage(), book.getPageCount()),
                 libraryBook.getPersonalRating(),
                 libraryBook.getStartedDate(),
                 libraryBook.getFinishedDate(),
@@ -44,11 +44,15 @@ public record LibraryBookResponse(
         );
     }
 
-    private static BigDecimal progressPercentage(Integer currentPage, Integer pageCount) {
+    private static BigDecimal progressPercentage(ReadingStatus status, Integer currentPage, Integer pageCount) {
         if (currentPage == null || pageCount == null || pageCount <= 0) {
             return null;
         }
-        return BigDecimal.valueOf(currentPage)
+        if (status == ReadingStatus.COMPLETED) {
+            return new BigDecimal("100.0");
+        }
+        int boundedPage = Math.min(Math.max(currentPage, 0), pageCount);
+        return BigDecimal.valueOf(boundedPage)
                 .multiply(BigDecimal.valueOf(100))
                 .divide(BigDecimal.valueOf(pageCount), 1, RoundingMode.HALF_UP);
     }

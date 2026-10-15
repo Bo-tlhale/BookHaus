@@ -115,6 +115,14 @@ class LibraryManagementServiceTest {
     }
 
     @Test
+    void completedBookProgressIsAlwaysOneHundredForKnownPageCount() {
+        LibraryBook libraryBook = libraryBook(1L, ReadingStatus.COMPLETED, 10, 400);
+        when(libraryBookRepository.findByIdAndUser(1L, currentUser)).thenReturn(Optional.of(libraryBook));
+
+        assertThat(service.getLibraryBook(1L).progressPercentage()).isEqualByComparingTo("100.0");
+    }
+
+    @Test
     void rejectsProgressAboveKnownPageCount() {
         LibraryBook libraryBook = libraryBook(1L, ReadingStatus.CURRENTLY_READING, 20, 400);
         when(libraryBookRepository.findByIdAndUser(1L, currentUser)).thenReturn(Optional.of(libraryBook));
