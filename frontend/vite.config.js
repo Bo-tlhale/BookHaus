@@ -14,7 +14,7 @@ export default defineConfig({
     globals: true,
     setupFiles: './src/test/setup.js',
     css: true,
-    pool: 'forks',
+    pool: 'threads',
     maxWorkers: 1,
     isolate: false,
   },
