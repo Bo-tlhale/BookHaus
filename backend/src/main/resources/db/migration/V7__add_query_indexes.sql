@@ -4,3 +4,4 @@ CREATE INDEX idx_library_books_user_added_at ON library_books (user_id, added_at
 CREATE INDEX idx_shelves_user_position ON shelves (user_id, position);
 CREATE INDEX idx_shelf_books_shelf_position ON shelf_books (shelf_id, position);
 CREATE INDEX idx_quotes_library_book_created_at ON quotes (library_book_id, created_at);
+CREATE INDEX idx_reading_goals_user_year ON reading_goals (user_id, year);
