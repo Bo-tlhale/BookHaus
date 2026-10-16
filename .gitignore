@@ -7,10 +7,15 @@
 backend/target/
 *.class
 *.log
+*.hprof
+*.dump
+*.backup
+pgdata/
 
 # IDEs and editors
 .idea/
 .vscode/
+.fleet/
 *.iml
 .classpath
 .project

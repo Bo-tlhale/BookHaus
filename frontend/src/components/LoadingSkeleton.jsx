@@ -5,5 +5,5 @@ export function CardGridSkeleton({ count = 6 }) {
 }
 
 export function PageLoader({ label = 'Loading…' }) {
-  return <div className="flex min-h-screen flex-col items-center justify-center bg-cream-50"><div className="mb-4 flex gap-1.5" aria-hidden="true"><span className="h-2.5 w-2.5 animate-bounce rounded-full bg-lavender-500" /><span className="h-2.5 w-2.5 animate-bounce rounded-full bg-skybook-400 [animation-delay:120ms]" /><span className="h-2.5 w-2.5 animate-bounce rounded-full bg-leaf-500 [animation-delay:240ms]" /></div><p className="text-sm text-stone-600">{label}</p></div>
+  return <div className="flex min-h-screen flex-col items-center justify-center bg-cream-50" role="status" aria-live="polite"><div className="mb-4 flex gap-1.5" aria-hidden="true"><span className="h-2.5 w-2.5 animate-bounce rounded-full bg-lavender-500" /><span className="h-2.5 w-2.5 animate-bounce rounded-full bg-skybook-400 [animation-delay:120ms]" /><span className="h-2.5 w-2.5 animate-bounce rounded-full bg-leaf-500 [animation-delay:240ms]" /></div><p className="text-sm text-stone-600">{label}</p></div>
 }

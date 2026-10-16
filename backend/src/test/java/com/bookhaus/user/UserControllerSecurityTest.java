@@ -64,7 +64,10 @@ class UserControllerSecurityTest {
     @Test
     void rejectsUnauthenticatedRequest() throws Exception {
         mockMvc.perform(get("/api/users/me"))
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.status").value(401))
+            .andExpect(jsonPath("$.message").value("Authentication is required"))
+            .andExpect(jsonPath("$.path").value("/api/users/me"));
     }
 
     @Test

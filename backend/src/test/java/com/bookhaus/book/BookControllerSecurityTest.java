@@ -1,6 +1,8 @@
 package com.bookhaus.book;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bookhaus.auth.JwtAuthenticationFilter;
@@ -44,5 +46,13 @@ class BookControllerSecurityTest {
                         .requestAttr(RequestDispatcher.ERROR_STATUS_CODE, 404)
                         .requestAttr(RequestDispatcher.ERROR_REQUEST_URI, "/api/books/999999999"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void returnsBadRequestWhenSearchQueryIsMissing() throws Exception {
+        mockMvc.perform(get("/api/books/search").with(user("reader@example.com")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("The request contains an invalid value"));
     }
 }

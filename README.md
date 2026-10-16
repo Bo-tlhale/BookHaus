@@ -4,7 +4,7 @@ BookHaus is a personal reading and library application for discovering books, bu
 
 ## Project status
 
-The backend and complete functional frontend are implemented through **Phase 9**.
+The backend and complete functional frontend are implemented and stabilized through **Phase 11**.
 
 | Phase | Status | Scope |
 | --- | --- | --- |
@@ -17,6 +17,7 @@ The backend and complete functional frontend are implemented through **Phase 9**
 | Phase 7: journals and quotes | Complete | Private reading reflections and favourite quote management |
 | Phase 8: goals and statistics | Complete | Annual reading goals, derived progress and personal reading insights |
 | Phase 9: React frontend | Complete | Responsive authentication, discovery, library, shelves, journals, quotes, goals and insights experience |
+| Phase 11: stabilization | Complete | Focused testing, consistent API errors, accessibility, production configuration and deployment preparation |
 | Later application features | Planned | API documentation, CI and immersive reading room |
 
 ## Technology
@@ -70,6 +71,7 @@ JWT_SECRET=your_base64_encoded_secret_of_at_least_32_bytes
 JWT_EXPIRATION=86400000
 OPEN_LIBRARY_BASE_URL=https://openlibrary.org
 FRONTEND_URL=http://localhost:5173
+SPRING_PROFILES_ACTIVE=dev
 ```
 
 Generate a suitable JWT secret in PowerShell:
@@ -120,6 +122,7 @@ Authorization: Bearer <jwt-token>
 | --- | --- | --- | --- |
 | `POST` | `/api/auth/register` | Public | Create an account and receive a JWT |
 | `POST` | `/api/auth/login` | Public | Authenticate and receive a JWT |
+| `GET` | `/api/health` | Public | Minimal hosting health check returning `{"status":"UP"}` |
 | `GET` | `/api/users/me` | Required | Return the authenticated user |
 | `GET` | `/api/books/search?q={query}` | Required | Search Open Library without persisting results |
 | `GET` | `/api/books/{id}` | Required | Return a locally persisted book |
@@ -220,6 +223,58 @@ npm run build
 ```
 
 The tests cover authentication, JWT validation, protected endpoints, Open Library mapping and failures, book persistence, library updates, derived progress, shelf management, journal upserts, quote validation and ordering, annual goals, fixed-clock pace calculations, statistics, conflicts, ownership, and book details.
+
+## Portfolio deployment
+
+The recommended low-complexity deployment is:
+
+- **Frontend:** Vercel
+- **Backend:** Render web service
+- **Database:** Render managed PostgreSQL
+
+Docker is not required or used. Flyway applies pending migrations when the backend starts, and Hibernate validates the migrated schema instead of mutating it.
+
+### Deploy the backend to Render
+
+Create a PostgreSQL database and a Java web service rooted at `backend`.
+
+- Build command: `mvn clean package -DskipTests`
+- Start command: `java -jar target/bookhaus-0.0.1-SNAPSHOT.jar`
+- Health check path: `/api/health`
+
+Configure these environment variables on the web service:
+
+```properties
+SPRING_PROFILES_ACTIVE=prod
+DB_URL=jdbc:postgresql://<database-host>:5432/<database-name>
+DB_USERNAME=<database-user>
+DB_PASSWORD=<database-password>
+JWT_SECRET=<base64-encoded-secret-of-at-least-32-bytes>
+JWT_EXPIRATION=86400000
+FRONTEND_URL=https://<production-frontend-domain>
+OPEN_LIBRARY_BASE_URL=https://openlibrary.org
+```
+
+Render supplies `PORT`; BookHaus also accepts `SERVER_PORT` for other hosts. Keep the JWT secret and database credentials only in the hosting provider's environment settings.
+
+### Deploy the frontend to Vercel
+
+Create a Vite project rooted at `frontend`.
+
+- Build command: `npm run build`
+- Output directory: `dist`
+- Environment variable: `VITE_API_BASE_URL=https://<render-backend-domain>`
+
+The included `frontend/vercel.json` sends client-side routes to `index.html`. After Vercel assigns the production domain, set the backend `FRONTEND_URL` to that exact origin and redeploy the backend so CORS permits it.
+
+### Production verification
+
+After both services deploy:
+
+1. Open the backend `/api/health` endpoint and verify `{"status":"UP"}`.
+2. Register from the production frontend, sign out, and sign in again.
+3. Search for a book, add it, and verify it persists after a reload.
+4. Confirm the browser console has no CORS, mixed-content, or failed API requests.
 
 ## Repository structure
 

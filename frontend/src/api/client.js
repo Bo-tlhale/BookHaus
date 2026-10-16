@@ -39,16 +39,21 @@ function errorMessage(body, status) {
 export async function apiRequest(path, options = {}) {
   const { body, headers = {}, auth = true, ...rest } = options
   const token = getStoredToken()
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...rest,
-    headers: {
-      Accept: 'application/json',
-      ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
-      ...(auth && token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
-  })
+  let response
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...rest,
+      headers: {
+        Accept: 'application/json',
+        ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+        ...(auth && token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
+      ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+    })
+  } catch {
+    throw new ApiError('BookHaus could not reach the server. Check your connection and try again.', 0)
+  }
 
   if (response.status === 204) return null
   const contentType = response.headers.get('content-type') || ''

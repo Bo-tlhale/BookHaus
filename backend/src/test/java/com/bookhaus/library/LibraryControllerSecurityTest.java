@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.bookhaus.auth.JwtAuthenticationFilter;
 import com.bookhaus.auth.JwtService;
@@ -68,7 +69,9 @@ class LibraryControllerSecurityTest {
                         .with(user("reader@example.com"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"currentPage\":-1}"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Please correct the highlighted fields"))
+                .andExpect(jsonPath("$.validationErrors.currentPage").exists());
     }
 
     @Test

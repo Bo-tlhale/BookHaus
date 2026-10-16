@@ -9,4 +9,14 @@ describe('apiRequest', () => {
     expect(caught).toBeInstanceOf(ApiError)
     expect(caught).toEqual(expect.objectContaining({ name: 'ApiError', status: 400, message: 'Current page cannot exceed page count' }))
   })
+
+  it('turns network failures into a useful BookHaus message', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
+
+    await expect(apiRequest('/api/example')).rejects.toEqual(expect.objectContaining({
+      name: 'ApiError',
+      status: 0,
+      message: 'BookHaus could not reach the server. Check your connection and try again.',
+    }))
+  })
 })
